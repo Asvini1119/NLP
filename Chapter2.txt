@@ -1,0 +1,105 @@
+
+
+#Exercise 1 — Stop Word Removal
+
+import nltk
+from nltk.corpus import stopwords
+
+nltk.download('stopwords')
+
+text = "NLP enables computers to understand human language, which is a crucial aspect of artificial intelligence."
+
+tokens = text.split()
+
+stop_words = set(stopwords.words('english'))
+
+filtered_tokens = [word for word in tokens if word.lower() not in stop_words]
+
+print(filtered_tokens)
+
+
+#Exercise 2 — Stemming
+
+
+from nltk.stem import PorterStemmer
+
+text = "Stemming helps in reducing words to their root form, which can be beneficial for text processing."
+
+tokens = text.split()
+
+stemmer = PorterStemmer()
+
+stemmed_tokens = [stemmer.stem(word) for word in tokens]
+
+print(stemmed_tokens)
+
+#Exercise 3 — Lemmatization
+
+
+import nltk
+from nltk.stem import WordNetLemmatizer
+
+nltk.download('wordnet')
+
+text = "Lemmatization is the process of reducing words to their base or root form."
+
+tokens = text.split()
+
+lemmatizer = WordNetLemmatizer()
+
+lemmatized_tokens = [lemmatizer.lemmatize(word) for word in tokens]
+
+print(lemmatized_tokens)
+
+
+
+#Exercise 4 — Regex Date Extraction
+import re
+
+text = "The project started on 2021-01-15 and ended on 2021-12-31."
+
+pattern = r"\b\d{4}-\d{2}-\d{2}\b"
+
+dates = re.findall(pattern, text)
+
+print(dates)
+
+#Exercise 5 — Word Tokenization
+
+import nltk
+from nltk.tokenize import word_tokenize
+
+nltk.download('punkt')
+
+text = "Tokenization is the first step in text preprocessing."
+
+tokens = word_tokenize(text)
+
+print(tokens)
+
+
+#Exercise 6 — Sentence Tokenization
+
+
+import nltk
+from nltk.tokenize import sent_tokenize
+
+nltk.download('punkt')
+
+text = "Tokenization is essential. It breaks down text into smaller units."
+
+sentences = sent_tokenize(text)
+
+print(sentences)
+
+#Exercise 7 — Character Tokenization
+
+
+def character_tokenization(text):
+    return list(text)
+
+text = "Character tokenization is useful for certain tasks."
+
+characters = character_tokenization(text)
+
+print(characters)
