@@ -1,0 +1,148 @@
+# ============================================================
+# CHAPTER 1 NLP CONSOLIDATED PRACTICE CODE
+# Covers:
+# 1. Tokenization (NLTK)
+# 2. Named Entity Recognition (spaCy)
+# 3. Sentiment Analysis (TextBlob)
+# 4. Text Summarization (Sumy)
+# 5. Text Classification (scikit-learn)
+# ============================================================
+
+
+# ============================================================
+# 1️⃣ TOKENIZATION USING NLTK
+# ============================================================
+
+import nltk
+
+# Download tokenizer model (only needed once)
+nltk.download('punkt')
+
+from nltk.tokenize import word_tokenize
+
+# Sample text
+text = "Natural Language Processing enables computers to understand human language."
+
+# Tokenize text into words
+tokens = word_tokenize(text)
+
+print("\n--- TOKENIZATION OUTPUT ---")
+print(tokens)
+
+
+
+# ============================================================
+# 2️⃣ NAMED ENTITY RECOGNITION USING SPACY
+# ============================================================
+
+import spacy
+
+# Load spaCy English model (must be installed beforehand)
+# Run once in command prompt:
+# python -m spacy download en_core_web_sm
+nlp = spacy.load("en_core_web_sm")
+
+text_ner = "Google was founded by Larry Page and Sergey Brin while they were Ph.D. students at Stanford University."
+
+# Process text
+doc = nlp(text_ner)
+
+print("\n--- NAMED ENTITY RECOGNITION OUTPUT ---")
+
+# Extract entities
+for ent in doc.ents:
+    print(ent.text, "->", ent.label_)
+
+
+
+# ============================================================
+# 3️⃣ SENTIMENT ANALYSIS USING TEXTBLOB
+# ============================================================
+
+from textblob import TextBlob
+
+text_sentiment = "I am extremely happy with the service provided."
+
+# Create TextBlob object
+blob = TextBlob(text_sentiment)
+
+# Get sentiment scores
+sentiment = blob.sentiment
+
+print("\n--- SENTIMENT ANALYSIS OUTPUT ---")
+print("Polarity:", sentiment.polarity)
+print("Subjectivity:", sentiment.subjectivity)
+
+
+
+# ============================================================
+# 4️⃣ TEXT SUMMARIZATION USING SUMY (LSA METHOD)
+# ============================================================
+
+from sumy.parsers.plaintext import PlaintextParser
+from sumy.nlp.tokenizers import Tokenizer
+from sumy.summarizers.lsa import LsaSummarizer
+
+text_summary = """
+Natural Language Processing (NLP) is a fascinating field at the intersection of computer science,
+artificial intelligence, and linguistics. It enables machines to understand, interpret, and generate
+human language, opening up a world of possibilities for applications ranging from chatbots and
+translation services to sentiment analysis and beyond. The evolution of NLP has been driven by
+significant advances in machine learning and deep learning, which have enabled more sophisticated
+and accurate models for language understanding. This book aims to bring these cutting-edge techniques
+to you in an accessible and practical way, regardless of your current level of expertise.
+"""
+
+# Create parser
+parser = PlaintextParser.from_string(text_summary, Tokenizer("english"))
+
+# Create summarizer object
+summarizer = LsaSummarizer()
+
+# Generate summary (2 sentences)
+summary = summarizer(parser.document, 2)
+
+print("\n--- TEXT SUMMARIZATION OUTPUT ---")
+for sentence in summary:
+    print(sentence)
+
+
+
+# ============================================================
+# 5️⃣ TEXT CLASSIFICATION USING SCIKIT-LEARN
+# ============================================================
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+
+# Training data
+texts = [
+    "I love this product",
+    "This is the worst experience",
+    "Absolutely fantastic!",
+    "Not good at all"
+]
+
+# Labels: 1 = Positive, 0 = Negative
+labels = [1, 0, 1, 0]
+
+# Convert text into numerical features
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(texts)
+
+# Train Naive Bayes classifier
+classifier = MultinomialNB()
+classifier.fit(X, labels)
+
+# New text to predict
+new_text = ["This experience was fantastic"]
+
+# Convert new text into same feature format
+X_new = vectorizer.transform(new_text)
+
+# Predict sentiment
+prediction = classifier.predict(X_new)
+
+print("\n--- TEXT CLASSIFICATION OUTPUT ---")
+print("Prediction:", prediction)
+print("(1 = Positive, 0 = Negative)")
