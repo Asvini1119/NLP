@@ -1,0 +1,245 @@
+# 3.1.1 Manual Bag of Words (Concept Understanding)
+
+import re
+import numpy as np
+
+documents = [
+    "Natural language processing is fun",
+    "Language models are important in NLP"
+]
+
+# Tokenization
+tokens_per_doc = [re.findall(r"\b\w+\b", doc.lower()) for doc in documents]
+
+# Build vocabulary
+vocab = sorted(set([token for doc in tokens_per_doc for token in doc]))
+word_index = {word: idx for idx, word in enumerate(vocab)}
+
+# Create BoW matrix
+bow_matrix = np.zeros((len(documents), len(vocab)), dtype=int)
+
+for doc_id, doc_tokens in enumerate(tokens_per_doc):
+    for token in doc_tokens:
+        bow_matrix[doc_id, word_index[token]] += 1
+
+print("Vocabulary:", vocab)
+print("BoW Matrix:")
+print(bow_matrix)
+
+
+# 3.1.2 Bag of Words using CountVectorizer
+
+from sklearn.feature_extraction.text import CountVectorizer
+
+documents = [
+    "Text processing is important for NLP.",
+    "Bag of Words is a simple text representation method.",
+    "Feature engineering is essential in machine learning."
+]
+
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(documents)
+
+print("Vocabulary:")
+print(vectorizer.get_feature_names_out())
+
+print("\nBag of Words Array:")
+print(X.toarray())
+
+
+# 3.1.4 Text Classification using BoW
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+documents = [
+    "Natural language processing is fun",
+    "Language models are important in NLP",
+    "I enjoy learning about artificial intelligence",
+    "Machine learning and NLP are closely related",
+    "Deep learning is a subset of machine learning"
+]
+
+labels = [1, 1, 0, 1, 0]
+
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(documents)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, labels, test_size=0.2, random_state=42
+)
+
+model = MultinomialNB()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+print("BoW Accuracy:", accuracy_score(y_test, y_pred))
+
+
+
+# 3.2.3 TF-IDF Representation
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+documents = [
+    "Natural language processing is fun.",
+    "Language models are important in NLP.",
+    "Machine learning and NLP are closely related."
+]
+
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(documents)
+
+print("Vocabulary:")
+print(vectorizer.get_feature_names_out())
+
+print("\nTF-IDF Array:")
+print(X.toarray())
+
+
+# 3.2.4 Text Classification using TF-IDF
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+documents = [
+    "Natural language processing is fun",
+    "Language models are important in NLP",
+    "I enjoy learning about artificial intelligence",
+    "Machine learning and NLP are closely related",
+    "Deep learning is a subset of machine learning"
+]
+
+labels = [1, 1, 0, 1, 0]
+
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(documents)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, labels, test_size=0.2, random_state=42
+)
+
+model = MultinomialNB()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+print("TF-IDF Accuracy:", accuracy_score(y_test, y_pred))
+
+
+# 3.3.2 Word2Vec Training
+
+from gensim.models import Word2Vec
+
+sentences = [
+    "natural language processing is fun and exciting".split(),
+    "language models are important in nlp".split(),
+    "machine learning and nlp are closely related".split()
+]
+
+model = Word2Vec(
+    sentences=sentences,
+    vector_size=100,
+    window=5,
+    min_count=1,
+    sg=1,
+    workers=1
+)
+
+print("Vector for 'nlp':")
+print(model.wv["nlp"])
+
+print("\nMost similar to 'nlp':")
+print(model.wv.most_similar("nlp"))
+
+
+
+# 3.3.3 Load Pretrained GloVe
+
+import gensim.downloader as api
+
+glove = api.load("glove-wiki-gigaword-100")
+
+print("Vector for 'machine':")
+print(glove["machine"])
+
+print("\nMost similar to 'machine':")
+print(glove.most_similar("machine"))
+
+
+# Sentence embedding using GloVe (Average)
+
+import numpy as np
+
+def sentence_embedding(sentence):
+    words = sentence.lower().split()
+    vectors = [glove[w] for w in words if w in glove]
+    return np.mean(vectors, axis=0)
+
+s1 = "machine learning is powerful"
+s2 = "deep learning models are strong"
+
+v1 = sentence_embedding(s1)
+v2 = sentence_embedding(s2)
+
+similarity = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+print("Sentence similarity:", similarity)
+
+
+# 3.4.3 Generate BERT Embeddings (CLS Token)
+
+from transformers import BertTokenizer, BertModel
+import torch
+
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+model = BertModel.from_pretrained("bert-base-uncased")
+
+text = "Transformers are powerful models for NLP tasks."
+
+inputs = tokenizer(text, return_tensors="pt")
+
+with torch.no_grad():
+    outputs = model(**inputs)
+
+cls_embedding = outputs.last_hidden_state[:, 0, :]
+
+print("CLS embedding shape:", cls_embedding.shape)
+print("First 10 values:", cls_embedding[0][:10])
+
+
+# Context-aware example: bank comparison
+
+def get_bank_embedding(sentence):
+    inputs = tokenizer(sentence, return_tensors="pt")
+    tokens = tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
+
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    embeddings = outputs.last_hidden_state[0]
+    index = tokens.index("bank")
+    return embeddings[index]
+
+v1 = get_bank_embedding("I sat on the river bank.")
+v2 = get_bank_embedding("I opened a bank account.")
+
+cos_sim = torch.nn.functional.cosine_similarity(v1, v2, dim=0)
+print("Cosine similarity (bank contexts):", cos_sim.item())
+
+# 3.4.4 Fine-tuning BERT for Classification (Basic Version)
+
+from transformers import pipeline
+
+classifier = pipeline("sentiment-analysis")
+
+texts = [
+    "I love this movie!",
+    "This is the worst experience ever."
+]
+
+print(classifier(texts))
